@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Установка OmniRoute и Claude Code</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        header p {
+            font-size: 16px;
+            opacity: 1;
+            color: white;
+        }
+
+        .content {
+            padding: 40px 30px;
+            background: linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #e8eaed;
+            flex-wrap: wrap;
+            background: #f8fafc;
+            padding: 8px;
+            border-radius: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .tab-button {
+            padding: 12px 20px;
+            border: 1px solid #e8eaed;
+            background: white;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            border-radius: 8px;
+            background: linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
+        }
+
+        .tab-button:hover {
+            color: #1e40af;
+            border-color: #1e40af;
+            box-shadow: 0 2px 8px rgba(30, 64, 175, 0.15);
+        }
+
+        .tab-button.active {
+            color: #1e40af;
+            border-bottom-color: #1e40af;
+            background: linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-color: #1e40af;
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.2);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        section {
+            margin-bottom: 40px;
+            padding-bottom: 40px;
+            border-bottom: none;
+        }
+
+        section:last-child {
+            border-bottom: none;
+        }
+
+        h2 {
+            font-size: 24px;
+            color: #1a1a1a;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e8eaed;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            background: linear-gradient(90deg, #f0f9ff 0%, transparent 100%);
+            padding-left: 15px;
+            border-radius: 6px;
+        }
+
+        h3 {
+            font-size: 18px;
+            color: #1a1a1a;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+        }
+
+        h3::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 20px;
+            background: #1e40af;
+            border-radius: 2px;
+        }
+
+        p {
+            color: #333;
+            line-height: 1.7;
+            margin-bottom: 15px;
+            font-size: 15px;
+        }
+
+        .code-block {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-left: 4px solid #1e40af;
+            padding: 18px;
+            margin: 15px 0;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 13px;
+            color: #1a1a1a;
+            line-height: 1.9;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            word-break: break-word;
+            border: 1px solid #e2e8f0;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .code-block code {
+            color: #1e40af;
+        }
+
+        .note {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-left: 4px solid #1e40af;
+            padding: 18px;
+            margin: 15px 0;
+            border-radius: 12px;
+            color: #1e3a8a;
+            font-size: 14px;
+            line-height: 1.6;
+            border: 1px solid #bae6fd;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .note:nth-of-type(2) {
+            background: #e0f2fe;
+            border-left-color: #0ea5e9;
+            color: #0c4a6e;
+        }
+
+        .note:nth-of-type(3) {
+            background: #e0f7fa;
+            border-left-color: #06b6d4;
+            color: #164e63;
+        }
+
+        .note:nth-of-type(4) {
+            background: #f0f9ff;
+            border-left-color: #3b82f6;
+            color: #1e40af;
+        }
+
+        .warning {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border-left: 4px solid #ff9800;
+            padding: 18px;
+            margin: 15px 0;
+            border-radius: 12px;
+            color: #e65100;
+            border: 1px solid #fcd34d;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .success {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border-left: 4px solid #4caf50;
+            padding: 18px;
+            margin: 15px 0;
+            border-radius: 12px;
+            color: #2e7d32;
+            border: 1px solid #bbf7d0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .success:nth-of-type(1) {
+            background: #e8f5e9;
+            border-left-color: #4caf50;
+            color: #2e7d32;
+        }
+
+        .checklist {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            padding: 24px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e8eaed;
+        }
+
+        .checklist-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .checklist-item input[type="checkbox"] {
+            margin-top: 4px;
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+            accent-color: #1e40af;
+        }
+
+        .checklist-item label {
+            cursor: pointer;
+            flex: 1;
+            color: #333;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 22px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid #1e40af;
+        }
+
+        .card:nth-child(1) {
+            border-left-color: #1e40af;
+        }
+
+        .card:nth-child(2) {
+            border-left-color: #0ea5e9;
+        }
+
+        .card:nth-child(3) {
+            border-left-color: #06b6d4;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .card h4 {
+            color: #1e40af;
+            margin-bottom: 10px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .card p {
+            font-size: 14px;
+            margin-bottom: 0;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: #1e40af;
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .step {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .step:nth-child(1) {
+            background: #f0f9ff;
+            border-left: 4px solid #1e40af;
+        }
+
+        .step:nth-child(2) {
+            background: #f0f9ff;
+            border-left: 4px solid #0ea5e9;
+        }
+
+        .step:nth-child(3) {
+            background: #ecf9ff;
+            border-left: 4px solid #06b6d4;
+        }
+
+        .step:nth-child(4) {
+            background: #f0f9ff;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-content h4 {
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: -0.2px;
+        }
+
+        .step-content p {
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .link-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+            border: 1px solid #90caf9;
+            border-radius: 12px;
+            padding: 18px;
+            text-decoration: none;
+            color: #1e40af;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .link-card:hover {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(30, 64, 175, 0.18);
+        }
+
+        .link-card strong {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .link-card span {
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+        .screenshots-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .screenshot-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border-left: 4px solid #0ea5e9;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .screenshot-item:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            transform: translateY(-4px);
+        }
+
+        .screenshot-item:nth-child(odd) {
+            border-left-color: #1e40af;
+        }
+
+        .screenshot-item:nth-child(4n+2) {
+            border-left-color: #0ea5e9;
+        }
+
+        .screenshot-item:nth-child(4n+3) {
+            border-left-color: #06b6d4;
+        }
+
+        .screenshot-item:nth-child(4n) {
+            border-left-color: #3b82f6;
+        }
+
+        .screenshot-item:hover {
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .screenshot-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+            background: #f0f0f0;
+            object-fit: contain;
+            max-height: 400px;
+        }
+
+
+        .screenshot-item p {
+            padding: 12px;
+            margin: 0;
+            font-size: 13px;
+            color: #666;
+            border-top: 1px solid #e8eaed;
+        }
+
+        footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            text-align: center;
+            color: #999;
+            font-size: 13px;
+            border-top: 1px solid #e8eaed;
+        }
+
+        ul {
+            margin-left: 20px;
+            color: #666;
+        }
+
+        ul li {
+            margin-bottom: 8px;
+        }
+
+        a {
+            color: #1e40af;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 25px 15px;
+            }
+
+            header h1 {
+                font-size: 22px;
+            }
+
+            header p {
+                font-size: 14px;
+            }
+
+            .content {
+                padding: 20px 15px;
+            }
+
+            .tabs {
+                gap: 5px;
+                padding: 5px;
+            }
+
+            .tab-button {
+                padding: 10px 12px;
+                font-size: 12px;
+                min-height: 40px;
+            }
+
+            h2 {
+                font-size: 18px;
+                padding-bottom: 10px;
+            }
+
+            h3 {
+                font-size: 15px;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .step {
+                flex-direction: row;
+                padding: 12px;
+                gap: 10px;
+            }
+
+            .step-number {
+                width: 24px;
+                height: 24px;
+                font-size: 12px;
+            }
+
+            .step-content h4 {
+                font-size: 14px;
+            }
+
+            .step-content p {
+                font-size: 13px;
+                margin-bottom: 5px;
+            }
+
+            .code-block {
+                font-size: 11px;
+                padding: 10px;
+                margin: 10px 0;
+            }
+
+            .screenshots-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .screenshot-item img {
+                max-height: 300px;
+            }
+
+            .screenshot-item p {
+                font-size: 12px;
+                padding: 8px;
+            }
+
+            .card {
+                padding: 15px;
+            }
+
+            .card h4 {
+                font-size: 14px;
+            }
+
+            .card p {
+                font-size: 13px;
+            }
+
+            .link-card {
+                padding: 12px;
+            }
+
+            .link-card strong {
+                font-size: 14px;
+            }
+
+            .link-card span {
+                font-size: 12px;
+            }
+
+            .note, .warning, .success {
+                padding: 12px;
+                font-size: 13px;
+            }
+
+            .checklist {
+                padding: 15px;
+            }
+
+            .checklist-item {
+                padding: 8px;
+            }
+
+            .checklist-item label {
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                padding: 20px 10px;
+            }
+
+            header h1 {
+                font-size: 20px;
+            }
+
+            .content {
+                padding: 15px 10px;
+            }
+
+            .tabs {
+                gap: 3px;
+                flex-direction: column;
+            }
+
+            .tab-button {
+                padding: 12px 10px;
+                font-size: 14px;
+                min-height: 44px;
+            }
+
+            h2 {
+                font-size: 16px;
+            }
+
+            h3 {
+                font-size: 14px;
+            }
+
+            .step {
+                padding: 10px;
+                gap: 8px;
+            }
+
+            .step-number {
+                width: 22px;
+                height: 22px;
+                font-size: 11px;
+            }
+
+            .code-block {
+                font-size: 10px;
+                padding: 8px;
+                overflow-x: auto;
+            }
+
+            .screenshot-item img {
+                max-height: 250px;
+            }
+
+            .screenshot-item p {
+                font-size: 11px;
+            }
+
+            .card {
+                padding: 12px;
+            }
+
+            .note, .warning, .success {
+                padding: 10px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Установка OmniRoute и Claude Code</h1>
+            <p>Полное руководство по настройке на Windows</p>
+        </header>
+
+        <div class="content">
+            <div class="note" style="margin-bottom: 20px;">
+                <p><strong>💡 Примечание:</strong> Для поиска ответов на вопросы можно использовать <a href="https://chat.deepseek.com/" target="_blank">https://chat.deepseek.com/</a> - мощный инструмент для поиска информации и решения задач.</p>
+            </div>
+
+            <div class="tabs">
+                <button class="tab-button active" onclick="switchTab(event, 'installation')">Установка</button>
+                <button class="tab-button" onclick="switchTab(event, 'configuration')">Настройка</button>
+                <button class="tab-button" onclick="switchTab(event, 'troubleshooting')">Проблемы</button>
+                <button class="tab-button" onclick="switchTab(event, 'checklist')">Чек-лист</button>
+                <button class="tab-button" onclick="switchTab(event, 'screenshots')">Скриншоты</button>
+            </div>
+
+            <!-- TAB 1: INSTALLATION -->
+            <div id="installation" class="tab-content active">
+                <section>
+                    <h2>Установка зависимостей</h2>
+
+                    <h3>Git</h3>
+                    <p><strong>Способ 1 — через winget (рекомендуется):</strong></p>
+                    <div class="code-block">winget install --id Git.Git -e --source winget</div>
+
+                    <p><strong>Способ 2 — через установщик:</strong></p>
+                    <p>Скачать с <a href="#">https://git-scm.com/install/windows</a></p>
+
+                    <p><strong>Проверка установки:</strong></p>
+                    <div class="code-block">git --version</div>
+
+                    <h3>Node.js</h3>
+                    <p>Скачать с <a href="#">https://nodejs.org/en/download</a></p>
+
+                    <p><strong>Рекомендуемые версии:</strong></p>
+                    <div class="grid">
+                        <div class="card">
+                            <h4>Node.js 22.22.2</h4>
+                            <p>Оптимальная, самая стабильная для OmniRoute</p>
+                        </div>
+                        <div class="card">
+                            <h4>Node.js 20.20.2</h4>
+                            <p>Если нужна более старая LTS</p>
+                        </div>
+                        <div class="card">
+                            <h4>Node.js 24.14.1</h4>
+                            <p>Если нужна новейшая версия</p>
+                        </div>
+                    </div>
+
+                    <p><strong>Проверка установки:</strong></p>
+                    <div class="code-block">node -v<br>npm -v</div>
+                </section>
+
+                <section>
+                    <h2>Установка Claude Code</h2>
+                    <p>Если Claude Code ещё не установлен, выполните команду:</p>
+                    <div class="code-block">npm install -g @anthropic-ai/claude-code</div>
+
+                    <p><strong>Проверка установки:</strong></p>
+                    <div class="code-block">claude --version</div>
+                </section>
+
+                <section>
+                    <h2>Установка OmniRoute</h2>
+                    <div class="code-block">npm install -g omniroute</div>
+
+                    <h3>Запуск OmniRoute</h3>
+                    <div class="code-block">omniroute</div>
+
+                    <div class="success">
+                        После запуска: Панель управления доступна по адресу <code>http://localhost:20128</code>
+                    </div>
+
+                    <p><strong>Пароль по умолчанию:</strong></p>
+                    <ul>
+                        <li>CHANGEME</li>
+                        <li>admin123</li>
+                        <li>123456</li>
+                    </ul>
+                </section>
+            </div>
+
+            <!-- TAB 2: CONFIGURATION -->
+            <div id="configuration" class="tab-content">
+                <section>
+                    <h2>Настройка API ключа в OmniRoute</h2>
+
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Открыть панель управления</h4>
+                            <p>Перейти на <code>http://localhost:20128</code> в браузере</p>
+                            <p><small>Откроется веб-интерфейс OmniRoute</small></p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Авторизация</h4>
+                            <p>Войти используя пароль по умолчанию</p>
+                            <p><small>Используйте CHANGEME, admin123 или 123456</small></p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Создать API ключ</h4>
+                            <p>Перейти в раздел <strong>Dashboard → Endpoints</strong></p>
+                            <p><small>Создайте новый API ключ для подключения</small></p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Скопировать ключ</h4>
+                            <p>Скопировать полученный ключ (формат: <code>sk-...</code>)</p>
+                            <p><small>Ключ понадобится для настройки Claude Code</small></p>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>Авторизация в бесплатных провайдерах (Providers)</h2>
+
+                    <p>OmniRoute поддерживает множество бесплатных провайдеров AI. Вот как настроить некоторых из них:</p>
+
+                    <h3>Kiro AI (Claude FREE)</h3>
+                    <p>Предоставляет бесплатный доступ к моделям Claude Sonnet и Haiku:</p>
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Подключение через Kiro</h4>
+                            <p>В панели управления: <strong>Dashboard → Connect Kiro</strong></p>
+                            <p><small>Нажмите кнопку для начала подключения</small></p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Авторизация</h4>
+                            <p>Использовать <strong>AWS Builder ID</strong> или <strong>Google/GitHub</strong> для входа</p>
+                            <p><small>Выберите удобный способ входа</small></p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Доступные модели</h4>
+                            <p>После подключения станут доступны:</p>
+                            <ul>
+                                <li><code>kr/claude-sonnet-4.5</code></li>
+                                <li><code>kr/claude-haiku-4.5</code></li>
+                            </ul>
+                            <p><small>Модели готовы к использованию</small></p>
+                        </div>
+                    </div>
+
+                    <h3>Qwen Code</h3>
+                    <p>Бесплатный провайдер от Alibaba Cloud с доступом к специализированным кодовым моделям.</p>
+
+                    <h3>Qoder AI</h3>
+                    <p>Бесплатный провайдер с поддержкой различных AI моделей для программирования.</p>
+
+                    <h3>Gemini CLI</h3>
+                    <p>Инструмент командной строки для работы с моделями Gemini (устаревший, но все еще доступен).</p>
+
+                    <div class="note">
+                        <p>Для большинства бесплатных провайдеров авторизация происходит через панель управления OmniRoute. После подключения они становятся доступны через единый API endpoint.</p>
+                        <p>Все эти провайдеры входят в состав OmniRoute и не требуют дополнительных API ключей от вас.</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>Настройка Claude Code</h2>
+
+                    <h3>Файл конфигурации</h3>
+                    <p>Файл <code>settings.json</code> находится в папке:</p>
+                    <div class="code-block">C:\Users\ВАШ_ПОЛЬЗОВАТЕЛЬ\.claude\</div>
+
+                    <p><strong>Папка создается автоматически при установке Claude Code.</strong></p>
+
+                    <h3>Добавить блок "env"</h3>
+                    <p>Откройте файл <code>C:\Users\ВАШ_ПОЛЬЗОВАТЕЛЬ\.claude\settings.json</code> и добавьте:</p>
+
+                    <div class="code-block">{
+  "env": {
+    "ANTHROPIC_API_KEY": "ВАШ КЛЮЧ ИЗ OmniRoute",
+    "ANTHROPIC_BASE_URL": "ВАША ССЫЛКА ИЗ OmniRoute, ПО УМОЛЧАНИЮ http://localhost:20128/v1",
+    "API_TIMEOUT_MS": "3000000",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "kr/claude-haiku-4.5",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "kr/claude-sonnet-4.5",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "qw/qwen3-coder-plus"
+  }
+}</div>
+
+                    <div class="note">
+                        В полях ANTHROPIC_DEFAULT_HAIKU_MODEL, ANTHROPIC_DEFAULT_SONNET_MODEL и ANTHROPIC_DEFAULT_OPUS_MODEL вы сами задаёте модели, которые вам нужны
+                    </div>
+                </section>
+            </div>
+
+            <!-- TAB 3: TROUBLESHOOTING -->
+            <div id="troubleshooting" class="tab-content">
+                <section>
+                    <h2>Возможные проблемы и решения</h2>
+
+                    <h3>OmniRoute не запускается</h3>
+                    <p><strong>Решение 1:</strong> Проверить версию Node.js (рекомендуется 22.22.2)</p>
+                    <div class="code-block">node -v</div>
+
+                    <p><strong>Решение 2:</strong> Переустановить OmniRoute</p>
+                    <div class="code-block">npm uninstall -g omniroute && npm install -g omniroute</div>
+
+                    <p><strong>Решение 3:</strong> Запустить с явным указанием порта</p>
+                    <div class="code-block">omniroute --port 20128</div>
+
+                    <h3>Ошибка "Tools for Native Modules"</h3>
+                    <p><strong>Решение:</strong></p>
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Запустить PowerShell от администратора</h4>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Выполнить команду</h4>
+                            <div class="code-block">npm install --global windows-build-tools</div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Дождаться полной установки</h4>
+                            <p>Может занять 5-10 минут</p>
+                        </div>
+                    </div>
+
+                    <h3>Порт 20128 занят</h3>
+                    <p><strong>Решение 1:</strong> Проверить кто занимает порт</p>
+                    <div class="code-block">netstat -ano | findstr :20128</div>
+
+                    <p><strong>Решение 2:</strong> Запустить OmniRoute на другом порту</p>
+                    <div class="code-block">omniroute --port 20129</div>
+
+                    <p><strong>Решение 3:</strong> Обновить ANTHROPIC_BASE_URL в settings.json</p>
+                    <div class="code-block">"ANTHROPIC_BASE_URL": "http://localhost:20129/v1"</div>
+
+                    <h3>Claude Code не видит OmniRoute</h3>
+                    <p><strong>Проверка 1:</strong> Убедиться что OmniRoute запущен и работает</p>
+
+                    <p><strong>Проверка 2:</strong> Проверить доступность в браузере</p>
+                    <div class="code-block">http://localhost:20128</div>
+
+                    <p><strong>Проверка 3:</strong> Проверить правильность API ключа в settings.json</p>
+
+                    <p><strong>Проверка 4:</strong> Выполнить диагностику в Claude Code</p>
+                    <div class="code-block">/doctor</div>
+                </section>
+            </div>
+
+            <!-- TAB 4: CHECKLIST -->
+            <div id="checklist" class="tab-content">
+                <section>
+                    <h2>Краткий чек-лист установки</h2>
+
+                    <div class="checklist">
+                        <div class="checklist-item">
+                            <input type="checkbox" id="check1">
+                            <label for="check1">Установить Git: <code>winget install --id Git.Git -e --source winget</code></label>
+                        </div>
+
+                        <div class="checklist-item">
+                            <input type="checkbox" id="check2">
+                            <label for="check2">Установить Node.js 22.22.2</label>
+                        </div>
+
+                        <div class="checklist-item">
+                            <input type="checkbox" id="check3">
+                            <label for="check3">Проверить: <code>node -v</code> и <code>npm -v</code></label>
+                        </div>
+
+                        <div class="checklist-item">
+                            <input type="checkbox" id="check4">
+                            <label for="check4">Установить Claude Code: <code>npm install -g @anthropic-ai/claude-code</code></label>
+                        </div>
+
+                        <div class="checklist-item">
+                            <input type="checkbox" id="check5">
+                            <label for="check5">Установить OmniRoute: <code>npm install -g omniroute</code></label>
+                        </div>
+
+                        <div class="checklist-item">
+                            <input type="checkbox" id="check6">
+                            <label for="check6">Запустить OmniRoute: <code>omniroute</code></label>
+                        </div>
+
+                        <div class="checklist-item">
+                            <input type="checkbox" id="check7">
+                            <label for="check7">Открыть <code>http://localhost:20128</code> и создать API ключ</label>
+                        </div>
+
+                        <div class="checklist-item">
+                            <input type="checkbox" id="check8">
+                            <label for="check8">Добавить блок "env" в <code>C:\Users\ВАШ_ПОЛЬЗОВАТЕЛЬ\.claude\settings.json</code></label>
+                        </div>
+
+                        <div class="checklist-item">
+                            <input type="checkbox" id="check9">
+                            <label for="check9">Запустить Claude Code: <code>claude</code></label>
+                        </div>
+
+                        <div class="checklist-item">
+                            <input type="checkbox" id="check10">
+                            <label for="check10">Проверить статус: <code>/status</code> в Claude Code</label>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>Важные примечания</h2>
+
+                    <div class="note">
+                        OmniRoute должен быть запущен перед использованием Claude Code
+                    </div>
+
+                    <div class="note">
+                        По умолчанию OmniRoute работает на порту 20128
+                    </div>
+
+                    <div class="note">
+                        Рекомендуемая версия Node.js: 22.22.2 (наиболее стабильная для работы с OmniRoute)
+                    </div>
+
+                    <div class="note">
+                        Все модели доступны через единый эндпоинт http://localhost:20128/v1
+                    </div>
+
+                    <h3>Проверенные версии</h3>
+                    <p>Эти версии работают хорошо и совместимы друг с другом:</p>
+                    <div class="code-block">git --version
+git version 2.53.0.windows.2
+
+node -v
+v22.22.2
+
+npm -v
+10.9.7
+
+claude --version
+2.1.104 (Claude Code)
+                </section>
+
+                <section>
+                    <h2>Полезные ссылки</h2>
+
+                    <div class="links">
+                        <a href="#" class="link-card">
+                            <strong>Git для Windows</strong>
+                            <span>Скачать установщик</span>
+                        </a>
+
+                        <a href="#" class="link-card">
+                            <strong>Node.js</strong>
+                            <span>Скачать LTS версию</span>
+                        </a>
+
+                        <a href="#" class="link-card">
+                            <strong>OmniRoute Dashboard</strong>
+                            <span>Панель управления (после запуска)</span>
+                        </a>
+                    </div>
+                </section>
+            </div>
+
+            <!-- TAB 5: SCREENSHOTS -->
+            <div id="screenshots" class="tab-content">
+                <section>
+                    <h2>Скриншоты процесса установки</h2>
+
+                    <div class="screenshots-grid">
+                        <div class="screenshot-item">
+                            <img src="./Снимок экрана 2026-04-13 162227.png" alt="Скриншот 1" loading="lazy">
+                            <p>Шаг 1</p>
+                        </div>
+
+                        <div class="screenshot-item">
+                            <img src="./Снимок экрана 2026-04-13 162247.png" alt="Скриншот 2" loading="lazy">
+                            <p>Шаг 2</p>
+                        </div>
+
+                        <div class="screenshot-item">
+                            <img src="./Снимок экрана 2026-04-13 162328.png" alt="Скриншот 3" loading="lazy">
+                            <p>Шаг 3</p>
+                        </div>
+
+                        <div class="screenshot-item">
+                            <img src="./Снимок экрана 2026-04-13 162336.png" alt="Скриншот 4" loading="lazy">
+                            <p>Шаг 4</p>
+                        </div>
+
+
+                        <div class="screenshot-item">
+                            <img src="./Снимок экрана 2026-04-13 162432.png" alt="Скриншот 7" loading="lazy">
+                            <p>Шаг 7</p>
+                        </div>
+
+                        <div class="screenshot-item">
+                            <img src="./Снимок экрана 2026-04-13 162451.png" alt="Скриншот 8" loading="lazy">
+                            <p>Шаг 8</p>
+                        </div>
+
+                        <div class="screenshot-item">
+                            <img src="./Снимок экрана 2026-04-13 162527.png" alt="Скриншот 9" loading="lazy">
+                            <p>Шаг 9</p>
+                        </div>
+
+                        <div class="screenshot-item">
+                            <img src="./Снимок экрана 2026-04-13 162552.png" alt="Скриншот 10" loading="lazy">
+                            <p>Шаг 10</p>
+                        </div>
+
+                        <div class="screenshot-item">
+                            <img src="./Снимок экрана 2026-04-13 162605.png" alt="Скриншот 11" loading="lazy">
+                            <p>Шаг 11</p>
+                        </div>
+
+                        <div class="screenshot-item">
+                            <img src="./Снимок экрана 2026-04-13 162632.png" alt="Скриншот 12" loading="lazy">
+                            <p>Шаг 12</p>
+                        </div>
+
+                        <div class="screenshot-item">
+                            <img src="./Снимок экрана 2026-04-13 162640.png" alt="Скриншот 13" loading="lazy">
+                            <p>Шаг 13</p>
+                        </div>
+
+                        <div class="screenshot-item">
+                            <img src="./Снимок экрана 2026-04-13 162646.png" alt="Скриншот 14" loading="lazy">
+                            <p>Шаг 14</p>
+                        </div>
+
+                        <div class="screenshot-item">
+                            <img src="./Снимок экрана 2026-04-13 162658.png" alt="Скриншот 15" loading="lazy">
+                            <p>Шаг 15</p>
+                        </div>
+
+                        <div class="screenshot-item">
+                            <img src="./Снимок экрана 2026-04-13 162754.png" alt="Скриншот 16" loading="lazy">
+                            <p>Шаг 16</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+        <footer>
+            <p>Руководство по установке OmniRoute и Claude Code на Windows</p>
+        </footer>
+    </div>
+
+    <script>
+        function switchTab(event, tabName) {
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(button => button.classList.remove('active'));
+
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
